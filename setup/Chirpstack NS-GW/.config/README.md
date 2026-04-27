@@ -12,20 +12,9 @@ This file serves as the primary configuration for the Network Server infrastruct
 
 ### Key Changes
 
-- **Database Connections**  
-  The PostgreSQL DSN and Redis server addresses were updated to point to the `postgres` and `redis` container names instead of `localhost`.
-
-- **MQTT Integration**  
-  The MQTT server address was changed to `tcp://mosquitto:1883` to allow the server to communicate with the Mosquitto broker.
-
-- **Logging Fixes**  
-  A duplicate `json = false` entry was commented out to prevent configuration errors during startup.
-
-- **Region Activation**  
-  The `eu868` region was added to the `enabled_regions` vector to ensure the server loads the correct radio parameters for testing.
-
-- **Role Suffix**  
-  The `use_target_role_suffix` parameter was modified to resolve UI-related errors.
+- **Database Connections** The PostgreSQL DSN and Redis server addresses were updated to point to the `postgres` and `redis` container names instead of `localhost`.
+- **MQTT Integration** The MQTT server address was changed to `tcp://mosquitto:1883` to allow the server to communicate with the Mosquitto broker.
+- **Region Activation** The `eu868` region was added to the `enabled_regions` vector to ensure the server loads the correct radio parameters for testing.
 
 ---
 
@@ -36,6 +25,6 @@ The file was downloaded directly from the official ChirpStack repository to ensu
 
 ---
 
-These files are essential when running the Network Server from source after modifying the helpers.rs file. To start the server using these specific configurations, execute the following command from the chirpstack/chirpstack directory:
+These files are essential when running the Network Server from source after modifying the helpers.rs file. To start the server using these specific configurations, execute the following command from the `chirpstack/chirpstack` directory:
 
 `cargo run --config ./config`
