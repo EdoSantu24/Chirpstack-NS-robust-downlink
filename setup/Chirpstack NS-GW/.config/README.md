@@ -1,6 +1,6 @@
 # Configuration Files
 
-A `config` folder was created inside chirpstack repository to isolate the specific settings required for this project from the generic templates provided in the ChirpStack source code. By using a dedicated directory, the Network Server can be executed with a configuration optimized for a Docker-based development environment on our Raspberry Pi.
+A `config` folder was created inside chirpstack repository to isolate the specific settings required for this project from the generic templates provided in the ChirpStack source code (i.e. inside the ./configuration folder). By using a dedicated directory, the Network Server can be executed with a configuration optimized for a Docker-based development environment on our Raspberry Pi.
 
 This approach follows the ChirpStack v4 best practice of maintaining a main configuration file alongside separate region-specific files.
 
