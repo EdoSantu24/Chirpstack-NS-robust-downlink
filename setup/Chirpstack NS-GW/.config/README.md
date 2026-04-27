@@ -34,3 +34,8 @@ This file serves as the primary configuration for the Network Server infrastruct
 This file defines the physical radio parameters and gateway backend settings specifically for the EU868 region.
 The file was downloaded directly from the official ChirpStack repository to ensure regional accuracy.
 
+---
+
+These files are essential when running the Network Server from source after modifying the helpers.rs file. To start the server using these specific configurations, execute the following command from the chirpstack/chirpstack directory:
+
+`cargo run --config ./config`
