@@ -46,17 +46,17 @@ const LAST_JOIN_GW_TTL: u64 = 3600; // 1 hour
 // ─── Score tuning constants ───────────────────────────────────────────────────
 
 /// Amount by which duty_cycle increases each time the gateway is selected.
-pub const DUTY_CYCLE_STEP: f64 = 0.1;
+pub const DUTY_CYCLE_STEP: f64 = 0.05;
 
 /// Amount by which join_reliability decreases on each consecutive-join event.
-pub const JOIN_RELIABILITY_STEP: f64 = 0.1;
+pub const JOIN_RELIABILITY_STEP: f64 = 0.15;
 
 // ─── Score component weights (must sum to 1.0) ────────────────────────────────
 
 pub const WEIGHT_RSSI: f64 = 0.17;
 pub const WEIGHT_SNR: f64 = 0.17;
-pub const WEIGHT_DUTY_CYCLE: f64 = 0.33;
-pub const WEIGHT_JOIN_RELIABILITY: f64 = 0.33;
+pub const WEIGHT_DUTY_CYCLE: f64 = 0.26;
+pub const WEIGHT_JOIN_RELIABILITY: f64 = 0.4;
 
 // ─── RSSI / SNR scaling bounds ────────────────────────────────────────────────
 
