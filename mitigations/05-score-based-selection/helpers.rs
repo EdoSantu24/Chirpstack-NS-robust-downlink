@@ -26,6 +26,13 @@ use crate::config;
 use crate::region;
 use crate::storage::gateway_score::{self, GatewayScoreState};
 
+use rand::{RngExt, SeedableRng, rngs::StdRng};
+
+/// Standard deviation of the half-Gaussian noise added to each gateway score.
+/// With σ=0.08: ~84% of noise values fall below 0.08, rare boosts up to ~0.24.
+/// Increase to allow more upsets; decrease for more deterministic selection.
+const SCORE_NOISE_SIGMA: f64 = 0.08;
+
 // ─── Gateway selection ────────────────────────────────────────────────────────
 
 /// Selects the best gateway for a downlink transmission using a four-component
@@ -143,18 +150,47 @@ pub async fn select_downlink_gateway(
     };
 
 
-    let selected_candidate = pool
+    // Sample half-Gaussian noise once per candidate using Box-Muller transform.
+    // Each gateway's effective score = base score + |N(0, σ)|.
+    // The noise is always non-negative, so a gateway's score can only be boosted,
+    // never penalised. The mode of the noise is 0 (most of the time the boost is
+    // negligible), but the tail gives lower-scored gateways a rare chance to win.
+    let mut rng = rand::rng();
+    let noised: Vec<f64> = {
+        let seed = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .subsec_nanos() as u64;
+        let mut rng = StdRng::seed_from_u64(seed);
+        pool
+            .iter()
+            .map(|c| {
+                let u1: f64 = rng.random::<f64>().max(1e-10);
+                let u2: f64 = rng.random::<f64>();
+                let gaussian = (-2.0_f64 * u1.ln()).sqrt()
+                    * (2.0_f64 * std::f64::consts::PI * u2).cos();
+                c.score + gaussian.abs() * SCORE_NOISE_SIGMA
+            })
+            .collect()
+    };
+
+    let selected_idx = noised
         .iter()
-        .max_by(|a, b| a.score.partial_cmp(&b.score).unwrap())
+        .enumerate()
+        .max_by(|(_, a), (_, b)| a.partial_cmp(b).unwrap())
+        .map(|(i, _)| i)
         .expect("pool is non-empty");
 
-    let best_score = selected_candidate.score;
-    let selected = selected_candidate.item.clone();
+    let best_score = pool[selected_idx].score;
+    let noise_applied = noised[selected_idx] - best_score;
+    let selected = pool[selected_idx].item.clone();
 
     info!(
-        "[GW SCORE] >>> Selected gateway={} with score={:.4}",
+        "[GW SCORE] >>> Selected gateway={} | base_score={:.4} | noise={:.4} | final_score={:.4}",
         hex::encode(&selected.gateway_id),
         best_score,
+        noise_applied,
+        noised[selected_idx],
     );
 
     // ── 5. Update score state in Redis ────────────────────────────────────────
