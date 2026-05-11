@@ -139,13 +139,7 @@ pub async fn get_gateway_score_state(gateway_id: &[u8]) -> Result<GatewayScoreSt
     let val: Option<String> = conn.get(&key).await?;
     Ok(match val {
         Some(s) => serde_json::from_str(&s)?,
-        None => {
-            match hex::encode(gateway_id).as_str() {
-                "aa555a0000000001" => GatewayScoreState { duty_cycle: 1.0, join_reliability: 1.0 },
-                "aa555a0000000002" => GatewayScoreState { duty_cycle: 0.0, join_reliability: 1.0 },
-                _ => GatewayScoreState::default(),
-            }
-        }
+        None => GatewayScoreState::default(),
     })
 }
 
