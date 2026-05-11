@@ -29,9 +29,9 @@ use crate::storage::gateway_score::{self, GatewayScoreState};
 use rand::{RngExt, SeedableRng, rngs::StdRng};
 
 /// Standard deviation of the half-Gaussian noise added to each gateway score.
-/// With σ=0.08: ~84% of noise values fall below 0.08, rare boosts up to ~0.24.
+/// With σ=0.08: ~84% of noise values fall below 0.16, rare boosts up to ~0.40.
 /// Increase to allow more upsets; decrease for more deterministic selection.
-const SCORE_NOISE_SIGMA: f64 = 0.08;
+const SCORE_NOISE_SIGMA: f64 = 0.1;
 
 // ─── Gateway selection ────────────────────────────────────────────────────────
 
@@ -155,7 +155,9 @@ pub async fn select_downlink_gateway(
     // The noise is always non-negative, so a gateway's score can only be boosted,
     // never penalised. The mode of the noise is 0 (most of the time the boost is
     // negligible), but the tail gives lower-scored gateways a rare chance to win.
-    let mut rng = rand::rng();
+
+
+    //let mut rng = rand::rng();
     let noised: Vec<f64> = {
         let seed = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
@@ -169,11 +171,21 @@ pub async fn select_downlink_gateway(
                 let u2: f64 = rng.random::<f64>();
                 let gaussian = (-2.0_f64 * u1.ln()).sqrt()
                     * (2.0_f64 * std::f64::consts::PI * u2).cos();
-                c.score + gaussian.abs() * SCORE_NOISE_SIGMA
+                let noise = gaussian.abs() * SCORE_NOISE_SIGMA;
+                let final_score = c.score + noise;
+
+                info!(
+                    "[GW SCORE] gateway={} | base_score={:.4} | noise={:.4} | final_score={:.4}",
+                    hex::encode(&c.item.gateway_id),
+                    c.score,
+                    noise,
+                    final_score,
+                );
+
+                final_score
             })
             .collect()
     };
-
     let selected_idx = noised
         .iter()
         .enumerate()
