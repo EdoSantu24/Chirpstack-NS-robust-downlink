@@ -45,7 +45,7 @@ pub fn select_downlink_gateway(
     // ========================================================================
     // Filter out gateways reporting physically improbable signal values.
     rx_info.items.retain(|item| {
-        let snr_is_plausible = item.lora_snr <= 10.0; // SNR is a float
+        let snr_is_plausible = item.lora_snr <= 20.0; // SNR is a float
         let rssi_is_plausible = item.rssi <= -40;     // RSSI is an integer
         let passes_heuristic = snr_is_plausible && rssi_is_plausible;
 
