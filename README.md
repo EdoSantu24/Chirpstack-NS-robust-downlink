@@ -1,3 +1,5 @@
+# Robust Downlink Gateway Selection in LoRaWAN
+
 This is the companion repository for *"Robust Downlink Gateway Selection in LoRaWAN: Server-Side Mitigations Against Radio Parameter Spoofing Attacks"*.
 
 It contains only the files we changed relative to a stock ChirpStack v4 Network Server deployment. To reproduce our testbed, clone the [official ChirpStack repository](https://github.com/chirpstack/chirpstack) and layer these files on top of it, as described in `setup/chirpstack-ns-gw/README.md`.
