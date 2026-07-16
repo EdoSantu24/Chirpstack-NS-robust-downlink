@@ -6,7 +6,7 @@ This is the vulnerable baseline every other mitigation in this repo is compared 
 
 `select_downlink_gateway` filters out gateways from other tenants that don't allow private downlinks, sorts the remaining candidates by SNR (RSSI as tiebreaker), and keeps only the ones whose SNR clears the required margin for the device's data rate. It then deterministically returns the top candidate from that filtered, sorted list.
 
-Because the malicious gateway always reports an artificially excellent SNR/RSSI (see `setup/malicious-gw/`), it always sorts to the top of this list and is selected for every downlink — which is exactly the failure mode Section III of the paper describes.
+Because the malicious gateway always reports an artificially excellent SNR/RSSI (see `setup/malicious-gw/`), it always sorts to the top of this list and is selected for every downlink, which is exactly the failure mode Section III of the paper describes.
 
 Section III (Vulnerability and Threat Model) describes the attack against this exact behavior. Section IV's mitigations are all evaluated relative to this baseline; it corresponds to the "Best RSSI/SNR" condition in the Fig. 4 evaluation.
 
