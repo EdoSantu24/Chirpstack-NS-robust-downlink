@@ -1,14 +1,14 @@
 # Chirpstack-NS-robust-downlink
 
-This is the companion repository for *"Robust Downlink Gateway Selection in LoRaWAN: Server-Side Mitigations Against Radio Parameter Spoofing Attacks"* (IEEE Internet of Things Journal, 2026).
+This is the companion repository for *"Robust Downlink Gateway Selection in LoRaWAN: Server-Side Mitigations Against Radio Parameter Spoofing Attacks"*.
 
-It contains only the files we changed relative to a stock ChirpStack v4 Network Server deployment — not a full fork. To reproduce our testbed, clone the [official ChirpStack repository](https://github.com/chirpstack/chirpstack) and layer these files on top of it, as described in `setup/chirpstack-ns-gw/README.md`.
+It contains only the files we changed relative to a stock ChirpStack v4 Network Server deployment. To reproduce our testbed, clone the [official ChirpStack repository](https://github.com/chirpstack/chirpstack) and layer these files on top of it, as described in `setup/chirpstack-ns-gw/README.md`.
 
 ## The attack
 
 LoRaWAN commits to a single gateway for each downlink transmission, and that gateway is chosen by the Network Server based on the RSSI and SNR values gateways report alongside the uplinks they forward. Nothing in the protocol verifies that these values are truthful.
 
-We show that a malicious gateway can exploit this by reporting fixed, artificially excellent RSSI/SNR values, which makes the Network Server select it for every downlink regardless of its real link quality. The gateway then silently drops the downlink instead of transmitting it, while still sending the Network Server a valid acknowledgment. Because the end device never receives the packet, it retries — repeatedly, in the case of the OTAA join procedure, which depends on a downlink (the JoinAccept) to complete. The result is a denial of service: the device can get stuck unable to join the network, and if it does have a session, application downlinks never arrive. We also measured the side effect on the end device's power draw, since every failed receive window and retry adds current consumption that shortens battery life.
+We show that a malicious gateway can exploit this by reporting fixed, artificially excellent RSSI/SNR values, which makes the Network Server select it for every downlink regardless of its real link quality. The gateway then silently drops the downlink instead of transmitting it, while still sending the Network Server a valid acknowledgment. Because the end device never receives the packet, it retries, repeatedly, in the case of the OTAA join procedure, which depends on a downlink (the JoinAccept) to complete. The result is a denial of service: the device can get stuck unable to join the network, and if it does have a session, application downlinks never arrive. We also measured the side effect on the end device's power draw, since every failed receive window and retry adds current consumption that shortens battery life.
 
 The malicious gateway is implemented as a modified Semtech packet forwarder (`setup/malicious-gw/`); everything else in this repo is the corresponding server-side response.
 
